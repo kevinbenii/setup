@@ -1,0 +1,14 @@
+{
+  "name": "setup1",
+  "version": "1.0.0",
+  "description": "Setup Assignment 2: Server Side HelloWorld",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Kevin Beni",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.0"
+  }
+}
