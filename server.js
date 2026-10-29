@@ -1,16 +1,24 @@
-const express = require("express");
+const mongoose = require("mongoose");
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+//testdb is name of database, it will automatically make it
+mongoose
+  .connect("mongodb+srv://kevinbeni326_db_user:<db_password>@kevinbeni.mtgqenx.mongodb.net/testdb?retryWrites=true&w=majority")
+  .then(() => console.log("Connected to mongodb..."))
+  .catch((err) => console.error("could not connect ot mongodb...", err));
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World from the K-AI server!</h1>");
+const schema = new mongoose.Schema({
+  name: String,
 });
 
-app.get("/api/hello", (req, res) => {
-  res.json({ message: "Hello World", project: "K-AI" });
+async function createMessage() {
+  const result = await message.save();
+  console.log(result);
+}
+
+//this creates a Message class in our app
+const Message = mongoose.model("Message", schema);
+const message = new Message({
+  name: "Hello World",
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+createMessage();
