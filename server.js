@@ -22,9 +22,14 @@ const schema = new mongoose.Schema({
   name: String,
 });
 
+// Save a test message (errors won't crash the server)
 async function createMessage() {
-  const result = await message.save();
-  console.log(result);
+  try {
+    const result = await message.save();
+    console.log(result);
+  } catch (err) {
+    console.error("could not save message...", err.message);
+  }
 }
 
 //this creates a Message class in our app
