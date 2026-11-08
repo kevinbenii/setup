@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const mongoose = require("mongoose");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,6 +10,27 @@ app.use(cors());
 
 // Images and pages in the public folder
 app.use(express.static("public"));
+
+//testdb is name of database, it will automatically make it
+mongoose
+  .connect("mongodb+srv://kevinbeni326_db_user:Prowen$2006@kevinbeni.mtgqenx.mongodb.net/testdb?retryWrites=true&w=majority")
+  .then(() => console.log("Connected to mongodb..."))
+  .catch((err) => console.error("could not connect ot mongodb...", err));
+
+const schema = new mongoose.Schema({
+  name: String,
+});
+
+async function createMessage() {
+  const result = await message.save();
+  console.log(result);
+}
+
+//this creates a Message class in our app
+const Message = mongoose.model("Message", schema);
+const message = new Message({
+  name: "Hello World",
+});
 
 // K·AI tools
 const tools = [
@@ -102,6 +124,8 @@ app.get("/api/hello", (req, res) => {
 app.get("/api/tools", (req, res) => {
   res.json(tools);
 });
+
+createMessage();
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
