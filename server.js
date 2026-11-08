@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
@@ -13,7 +14,7 @@ app.use(express.static("public"));
 
 //testdb is name of database, it will automatically make it
 mongoose
-  .connect("mongodb+srv://kevinbeni326_db_user:Prowen$2006@kevinbeni.mtgqenx.mongodb.net/testdb?retryWrites=true&w=majority")
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log("Connected to mongodb..."))
   .catch((err) => console.error("could not connect ot mongodb...", err));
 
