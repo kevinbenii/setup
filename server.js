@@ -94,10 +94,6 @@ const tools = [
   }
 ];
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World from the K-AI server!</h1>");
-});
-
 app.get("/api/hello", (req, res) => {
   res.json({ message: "Hello World", project: "K-AI" });
 });
