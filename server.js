@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const Joi = require("joi");
+const multer = require("multer");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -9,8 +11,23 @@ const PORT = process.env.PORT || 3000;
 // Let the React site read the data
 app.use(cors());
 
+// Read JSON sent to the server
+app.use(express.json());
+
 // Images and pages in the public folder
 app.use(express.static("public"));
+
+// Save uploaded images in public/images (time added so names never clash)
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "./public/images/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname.replace(/\s+/g, "-"));
+  },
+});
+
+const upload = multer({ storage: storage });
 
 //testdb is name of database, it will automatically make it
 mongoose
@@ -130,6 +147,57 @@ app.get("/api/hello", (req, res) => {
 app.get("/api/tools", (req, res) => {
   res.json(tools);
 });
+
+// Category page for each category
+const categoryLinks = {
+  "Education and Research": "/education",
+  "Coding and Technology": "/coding",
+  "Business and Productivity": "/business",
+  "Writing and Creativity": "/writing"
+};
+
+// Add a new tool
+app.post("/api/tools", upload.single("img"), (req, res) => {
+  const result = validateTool(req.body);
+
+  if (result.error) {
+    res.status(400).send(result.error.details[0].message);
+    return;
+  }
+
+  if (!req.file) {
+    res.status(400).send("Please choose an image for the tool.");
+    return;
+  }
+
+  const tool = {
+    _id: Math.max(0, ...tools.map((t) => t._id)) + 1,
+    name: req.body.name.trim(),
+    category: req.body.category,
+    description: req.body.description.trim(),
+    price: req.body.price.trim(),
+    platform: req.body.platform.trim(),
+    link: categoryLinks[req.body.category],
+    img_name: "images/" + req.file.filename
+  };
+
+  tools.push(tool);
+  res.status(200).send(tool);
+});
+
+// Rules for a tool (the React form uses the same rules)
+const validateTool = (tool) => {
+  const schema = Joi.object({
+    _id: Joi.allow(""),
+    name: Joi.string().trim().min(2).max(30).required(),
+    category: Joi.string().valid(...Object.keys(categoryLinks)).required(),
+    description: Joi.string().trim().min(5).max(120).required(),
+    price: Joi.string().trim().min(2).max(30).required(),
+    platform: Joi.string().trim().min(2).max(30).required()
+  });
+
+  return schema.validate(tool);
+};
 
 createMessage();
 
