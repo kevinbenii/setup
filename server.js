@@ -185,6 +185,53 @@ app.post("/api/tools", upload.single("img"), (req, res) => {
   res.status(200).send(tool);
 });
 
+// Edit a tool (new image is optional)
+app.put("/api/tools/:id", upload.single("img"), (req, res) => {
+  const tool = tools.find((t) => t._id === parseInt(req.params.id));
+
+  if (!tool) {
+    res.status(404).send("The tool with that id was not found.");
+    return;
+  }
+
+  const result = validateTool(req.body);
+
+  if (result.error) {
+    res.status(400).send(result.error.details[0].message);
+    return;
+  }
+
+  // New category means a new category page link
+  if (tool.category !== req.body.category) {
+    tool.link = categoryLinks[req.body.category];
+  }
+
+  tool.name = req.body.name.trim();
+  tool.category = req.body.category;
+  tool.description = req.body.description.trim();
+  tool.price = req.body.price.trim();
+  tool.platform = req.body.platform.trim();
+
+  if (req.file) {
+    tool.img_name = "images/" + req.file.filename;
+  }
+
+  res.status(200).send(tool);
+});
+
+// Delete a tool
+app.delete("/api/tools/:id", (req, res) => {
+  const tool = tools.find((t) => t._id === parseInt(req.params.id));
+
+  if (!tool) {
+    res.status(404).send("The tool with that id was not found.");
+    return;
+  }
+
+  tools.splice(tools.indexOf(tool), 1);
+  res.status(200).send(tool);
+});
+
 // Rules for a tool (the React form uses the same rules)
 const validateTool = (tool) => {
   const schema = Joi.object({
